@@ -199,6 +199,82 @@ export const products = [
   },
 ];
 
+export const latestDirections = [
+  {
+    product: "dumate" as ProductId,
+    latestDate: "2026-07-18",
+    capabilities: [
+      "企业版支持成员、席位、资源点和 Skill 统一分发",
+      "补充移动遥控、跨端同步、插件套件和执行环境",
+      "生成结果可以通过网页公开查看和分享",
+    ],
+    direction:
+      "DuMate 正在从单机桌面执行工具，发展为可由管理员分发、跨端连续执行并直接交付成果的部门级办公 Agent。",
+    reason: "最近更新都围绕组织部署、任务连续性和成果交付，没有明显转向专业数据或重型运行平台。",
+    boundary: "仍缺少运行期评测、记忆治理和具名企业持续使用证据。",
+  },
+  {
+    product: "workbuddy" as ProductId,
+    latestDate: "2026-07-30",
+    capabilities: [
+      "新增企业智能体、腾讯文档深度集成和长期记忆编辑",
+      "公开 Runtime、Session、凭据、Trace 和任务下发能力",
+      "补充企业 Agent 评测和生命周期管理",
+    ],
+    direction:
+      "WorkBuddy 正在从综合办公工作台，发展为企业 Agent 的托管运行和生命周期治理平台。",
+    reason: "新增能力已经越过文件生成和连接器，进入 Agent 如何运行、评测、下发和持续管理。",
+    boundary: "WMA 的价格、外部付费客户和实际运行频次仍未公开。",
+  },
+  {
+    product: "qwenwork" as ProductId,
+    latestDate: "2026-07-30",
+    capabilities: [
+      "网页、桌面和企业即时通信入口开始统一",
+      "提供可编辑 Office、企查查数据和岗位技能套件",
+      "通过钉钉账号、权限和组织关系触达企业用户",
+    ],
+    direction:
+      "千问办公正在把专业数据和钉钉组织入口，封装成可以直接选择和分发的岗位工作流。",
+    reason: "产品重点不是继续增加通用能力，而是让数据、岗位模板和组织入口一起工作。",
+    boundary: "品牌上线时间短，专业数据成本、产品级活跃和企业续费仍需核验。",
+  },
+  {
+    product: "traework" as ProductId,
+    latestDate: "2026-07-24",
+    capabilities: [
+      "新增插件市场和工作知识库",
+      "强化交互式网页和可运行成果",
+      "接入北大法宝，并补充图像和视频生成",
+    ],
+    direction:
+      "TRAE Work 正在从代码和网页交付，扩展到专业数据、多媒体和通用内容生产。",
+    reason: "它仍以工程交付为底座，但新增能力已经开始覆盖法律、营销和知识工作。",
+    boundary: "传统办公部门的企业价格、治理能力和可复制客户仍缺少公开证据。",
+  },
+];
+
+export const directionConclusions = [
+  {
+    title: "四家不是在同一条路上增加功能",
+    conclusion:
+      "WorkBuddy 在向企业运行治理做深。千问办公在强化数据和组织分发。TRAE Work 在扩大可交付成果范围。DuMate 在补齐部门部署和跨端执行。",
+    evidence: "四家的近期新增分别集中在 Runtime、专业数据与钉钉、交互网页与多媒体、企业版与跨端能力。",
+  },
+  {
+    title: "最新能力不等于已经形成企业生意",
+    conclusion:
+      "目前只有 WorkBuddy 同时出现当前产品采购、正式部署和渠道实施。其他三家更多依赖联合方案、前身能力或同品牌企业账户。",
+    evidence: "33 条合作记录中只有 1 条明确公开采购，且大量记录不能直接归因到当前办公产品。",
+  },
+  {
+    title: "DuMate 的重点不是继续追平功能数量",
+    conclusion:
+      "更需要把企业版、跨端执行和成果发布组合成可复用场景，并用具名客户、持续使用和第二部门扩张证明价值。",
+    evidence: "当前公开证据可以说明产品能力已经成形，但还不能说明企业采用和扩张已经稳定。",
+  },
+];
+
 export const comparisonRows = [
   {
     topic: "核心角色",

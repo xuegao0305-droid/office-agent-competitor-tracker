@@ -9,19 +9,19 @@ import {
   categories,
   companyCases,
   comparisonRows,
+  directionConclusions,
   EvidenceState,
   matrix,
+  latestDirections,
   products,
   ProductId,
   reportMeta,
   scaleSignals,
   screenshots,
-  trends,
   updates,
 } from "./data";
 
-type ViewId = "overview" | "profiles" | "matrix" | "progress" | "tracker";
-type ProgressMode = "updates" | "cases" | "scale";
+type ViewId = "latest" | "profiles" | "matrix" | "updates" | "cases" | "scale" | "tracker";
 type ProductFilter = "all" | ProductId;
 
 type LocalResearchNote = {
@@ -36,12 +36,14 @@ type LocalResearchNote = {
   createdAt: string;
 };
 
-const viewLabels: Array<{ id: ViewId; label: string; description: string }> = [
-  { id: "overview", label: "研究结论", description: "先看四家有什么不同" },
-  { id: "profiles", label: "四家产品", description: "结合界面逐家拆解" },
-  { id: "matrix", label: "差异对比", description: "按同一问题横向比较" },
-  { id: "progress", label: "发展与生意", description: "更新、客户和体量" },
-  { id: "tracker", label: "追踪录入", description: "添加和导出新记录" },
+const viewLabels: Array<{ id: ViewId; label: string; description: string; group: "核心分析" | "证据与维护" }> = [
+  { id: "latest", label: "最新能力", description: "一句话看清发展方向", group: "核心分析" },
+  { id: "profiles", label: "四家产品", description: "结合界面逐家拆解", group: "核心分析" },
+  { id: "matrix", label: "差异对比", description: "按同一问题横向比较", group: "核心分析" },
+  { id: "updates", label: "更新明细", description: "查看完整能力台账", group: "核心分析" },
+  { id: "cases", label: "客户与合作", description: "判断商业进展", group: "证据与维护" },
+  { id: "scale", label: "公开体量", description: "核对数据口径", group: "证据与维护" },
+  { id: "tracker", label: "追踪录入", description: "添加和导出新记录", group: "证据与维护" },
 ];
 
 const productMap = Object.fromEntries(products.map((product) => [product.id, product]));
@@ -109,8 +111,7 @@ function StateBadge({ state }: { state: EvidenceState }) {
 }
 
 export default function Home() {
-  const [view, setView] = useState<ViewId>("overview");
-  const [progressMode, setProgressMode] = useState<ProgressMode>("updates");
+  const [view, setView] = useState<ViewId>("latest");
   const [productFilter, setProductFilter] = useState<ProductFilter>("all");
   const [category, setCategory] = useState("全部");
   const [query, setQuery] = useState("");
@@ -136,6 +137,11 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    const requestedView = window.location.hash.slice(1) as ViewId;
+    if (viewLabels.some((item) => item.id === requestedView)) setView(requestedView);
+  }, []);
+
+  useEffect(() => {
     if (!activeScreenshot) return;
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") setActiveScreenshot(null);
@@ -153,6 +159,14 @@ export default function Home() {
       productFilter === "all"
         ? products
         : products.filter((product) => product.id === productFilter),
+    [productFilter],
+  );
+
+  const filteredLatestDirections = useMemo(
+    () =>
+      productFilter === "all"
+        ? latestDirections
+        : latestDirections.filter((item) => item.product === productFilter),
     [productFilter],
   );
 
@@ -214,14 +228,6 @@ export default function Home() {
     });
   }, [caseIndustry, caseMapping, caseQuery, caseRevenue, productFilter]);
 
-  const visibleCaseInsights = useMemo(
-    () =>
-      productFilter === "all"
-        ? caseInsights
-        : caseInsights.filter((item) => item.product === productFilter),
-    [productFilter],
-  );
-
   const visibleScaleSignals = useMemo(
     () =>
       productFilter === "all"
@@ -230,8 +236,17 @@ export default function Home() {
     [productFilter],
   );
 
+  const visibleCaseInsights = useMemo(
+    () =>
+      productFilter === "all"
+        ? caseInsights
+        : caseInsights.filter((item) => item.product === productFilter),
+    [productFilter],
+  );
+
   function switchView(nextView: ViewId) {
     setView(nextView);
+    window.history.replaceState(null, "", `#${nextView}`);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -326,7 +341,7 @@ export default function Home() {
           <p className="eyebrow">PRODUCT RESEARCH SYSTEM</p>
           <h1>{reportMeta.title}</h1>
           <p className="hero-lead">
-            四家都能完成办公任务，但不是同一种产品。DuMate 重流程执行，WorkBuddy 重企业运行，千问办公重数据和组织入口，TRAE Work 重工程交付。
+            先看最近新增了什么，再判断厂商往哪里发展。功能台账只保留在明细层，首页直接给出四家的方向结论和证据边界。
           </p>
           <div className="hero-actions">
             <button className="primary-button" type="button" onClick={() => switchView("profiles")}>
@@ -338,10 +353,7 @@ export default function Home() {
             <button
               className="secondary-button"
               type="button"
-              onClick={() => {
-                setProgressMode("cases");
-                switchView("progress");
-              }}
+              onClick={() => switchView("cases")}
             >
               查看客户与合作
             </button>
@@ -379,18 +391,32 @@ export default function Home() {
       </section>
 
       <nav className="view-tabs" aria-label="报告视图">
-        {viewLabels.map((item) => (
-          <button
-            aria-current={view === item.id ? "page" : undefined}
-            className={view === item.id ? "view-tab active" : "view-tab"}
-            key={item.id}
-            type="button"
-            onClick={() => switchView(item.id)}
-          >
-            <span>{item.label}</span>
-            <small>{item.description}</small>
-          </button>
+        <div className="side-nav-heading">
+          <span>研究目录</span>
+          <strong>办公 Agent 友商分析</strong>
+        </div>
+        {(["核心分析", "证据与维护"] as const).map((group) => (
+          <div className="side-nav-group" key={group}>
+            <span className="side-nav-label">{group}</span>
+            {viewLabels.filter((item) => item.group === group).map((item) => (
+              <button
+                aria-current={view === item.id ? "page" : undefined}
+                className={view === item.id ? "view-tab active" : "view-tab"}
+                key={item.id}
+                type="button"
+                onClick={() => switchView(item.id)}
+              >
+                <span>{item.label}</span>
+                <small>{item.description}</small>
+              </button>
+            ))}
+          </div>
         ))}
+        <div className="side-nav-meta">
+          <span>数据快照</span>
+          <strong>{reportMeta.snapshotDate}</strong>
+          <small>下次复核 {reportMeta.nextReviewDate}</small>
+        </div>
       </nav>
 
       <div className="toolbar">
@@ -398,154 +424,94 @@ export default function Home() {
         <p className="method-note">{reportMeta.method}</p>
       </div>
 
-      {view === "overview" && (
+      {view === "latest" && (
         <>
-          <section className="section">
+          <section className="section latest-section">
             <div className="section-heading">
               <div>
-                <p className="section-index">01 四家结论</p>
-                <h2>先回答四个产品有什么不同</h2>
+                <p className="section-index">最重要的结论</p>
+                <h2>最近新增能力正在把四家带向哪里</h2>
               </div>
-              <p>不先罗列功能。先看它们分别从哪里切入、最强的环节是什么，以及适合什么企业。</p>
+              <p>先把同一阶段新增的能力连起来，再判断发展方向。单个功能不会单独形成结论。</p>
             </div>
-            <div className="position-grid">
-              {filteredProducts.map((product) => (
-                <article className="position-card" key={product.id} style={productStyle(product.id)}>
-                  <span className="product-name">
-                    <span className="product-dot" />
-                    {product.name}
-                  </span>
-                  <h3>{product.role}</h3>
-                  <div>
-                    <span>最强环节</span>
-                    <p>{product.strongest}</p>
+            <div className="latest-direction-grid">
+              {filteredLatestDirections.map((item) => (
+                <article className="latest-direction-card" key={item.product} style={productStyle(item.product)}>
+                  <div className="latest-card-topline">
+                    <span className="product-name">
+                      <span className="product-dot" />
+                      {productMap[item.product].name}
+                    </span>
+                    <span>更新至 {item.latestDate}</span>
                   </div>
-                  <div>
-                    <span>主要区别</span>
-                    <p>{product.difference}</p>
+                  <div className="direction-answer">
+                    <span>一句话方向</span>
+                    <h3>{item.direction}</h3>
                   </div>
-                </article>
-              ))}
-            </div>
-          </section>
-
-          <section className="section">
-            <div className="section-heading">
-              <div>
-                <p className="section-index">02 新增方向</p>
-                <h2>最近更新在强化哪些差异</h2>
-              </div>
-              <p>新增功能只有在持续支持产品方向时才进入结论。</p>
-            </div>
-            <div className="trend-grid">
-              {trends.map((trend, index) => (
-                <article className="trend-card" key={trend.title}>
-                  <span className="trend-number">{String(index + 1).padStart(2, "0")}</span>
-                  <h3>{trend.title}</h3>
-                  <p>{trend.evidence}</p>
-                  <dl>
+                  <div className="latest-capabilities">
+                    <span>最近新增能力</span>
+                    <ul>
+                      {item.capabilities.map((capability) => (
+                        <li key={capability}>{capability}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <dl className="direction-reasoning">
                     <div>
-                      <dt>当前强信号</dt>
-                      <dd>{trend.leaders}</dd>
+                      <dt>为什么这样判断</dt>
+                      <dd>{item.reason}</dd>
                     </div>
                     <div>
-                      <dt>对 DuMate 的含义</dt>
-                      <dd>{trend.action}</dd>
+                      <dt>目前不能下的结论</dt>
+                      <dd>{item.boundary}</dd>
                     </div>
                   </dl>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setProductFilter(item.product);
+                      switchView("updates");
+                    }}
+                  >
+                    查看这家厂商的完整更新
+                  </button>
                 </article>
               ))}
             </div>
           </section>
 
-          <section className="section case-summary-section">
+          <section className="section conclusion-section">
             <div className="section-heading">
               <div>
-                <p className="section-index">03 客户与生意</p>
-                <h2>客户案例是否支持产品方向</h2>
+                <p className="section-index">穿透结论</p>
+                <h2>从能力更新穿透到竞争判断</h2>
               </div>
-              <p>WorkBuddy 的直接产品案例最完整。其他三家更多依赖联合方案、前身能力或同品牌企业账户。</p>
+              <p>这些结论回答竞争位置和企业生意，不重复功能列表。</p>
             </div>
-            <div className="case-metric-grid">
-              <article>
-                <strong>{companyCases.length}</strong>
-                <span>合作与使用记录</span>
-              </article>
-              <article>
-                <strong>{companyCases.filter((item) => item.mappingLevel === "当前产品").length}</strong>
-                <span>当前产品直接记录</span>
-              </article>
-              <article>
-                <strong>{companyCases.filter((item) => item.revenueStatus === "明确采购").length}</strong>
-                <span>明确公开采购</span>
-              </article>
-              <article>
-                <strong>{companyCases.filter((item) => item.revenueStatus === "较强部署").length}</strong>
-                <span>较强规模部署证据</span>
-              </article>
-            </div>
-            <div className="case-insight-grid">
-              {visibleCaseInsights.map((item) => (
-                <article className="case-insight-card" key={item.product} style={productStyle(item.product)}>
-                  <span className="product-name">
-                    <span className="product-dot" />
-                    {productMap[item.product].name}
-                  </span>
-                  <h3>{item.headline}</h3>
-                  <p>{item.finding}</p>
+            <div className="direction-conclusion-list">
+              {directionConclusions.map((item, index) => (
+                <article key={item.title}>
+                  <span>{String(index + 1).padStart(2, "0")}</span>
                   <div>
-                    <span>可借鉴或待验证</span>
-                    <p>{item.lesson}</p>
+                    <h3>{item.title}</h3>
+                    <p>{item.conclusion}</p>
+                    <small>判断依据：{item.evidence}</small>
                   </div>
                 </article>
               ))}
             </div>
-            <button
-              className="primary-button case-summary-action"
-              type="button"
-              onClick={() => {
-                setProgressMode("cases");
-                switchView("progress");
-              }}
-            >
-              查看完整客户与合作名单
-            </button>
           </section>
 
-          <section className="section">
+          <section className="section latest-implication-section">
             <div className="section-heading">
               <div>
-                <p className="section-index">04 公开体量</p>
-                <h2>四家的体量数据不能直接横比</h2>
+                <p className="section-index">对 DuMate 的即时含义</p>
+                <h2>先把已有能力变成可验证的企业场景</h2>
               </div>
-              <p>产品用户、内部使用、前身席位和渠道组织是不同口径。这里只展示可归因范围和边界。</p>
-            </div>
-            <div className="scale-card-grid">
-              {visibleScaleSignals.map((item) => (
-                <article className="scale-card" key={item.product} style={productStyle(item.product)}>
-                  <span className="product-name">
-                    <span className="product-dot" />
-                    {productMap[item.product].name}
-                  </span>
-                  <strong>{item.value}</strong>
-                  <h3>{item.metric}</h3>
-                  <p>{item.meaning}</p>
-                  <small>{item.boundary}</small>
-                </article>
-              ))}
-            </div>
-          </section>
-
-          <section className="section action-section">
-            <div className="section-heading">
-              <div>
-                <p className="section-index">05 DuMate 启示</p>
-                <h2>九十天内先证明可重复使用</h2>
-              </div>
-              <p>先做场景、实测和客户证据，再扩充通用功能。</p>
+              <p>竞争重点已经从能否生成文件，进入组织采用、运行治理和行业工作流。</p>
             </div>
             <div className="action-list">
-              {actions.map((item) => (
+              {actions.slice(0, 3).map((item) => (
                 <article className="action-row" key={item.title}>
                   <span className={`priority ${item.priority.toLowerCase()}`}>{item.priority}</span>
                   <div>
@@ -759,33 +725,7 @@ export default function Home() {
         </section>
       )}
 
-      {view === "progress" && (
-        <section className="section progress-navigation">
-          <div className="section-heading">
-            <div>
-              <p className="section-index">发展与生意</p>
-              <h2>功能方向要由客户和体量继续验证</h2>
-            </div>
-            <p>新增功能说明厂商想往哪里走。企业合作说明正在做什么生意。体量数据说明公开证据走到了哪一步。</p>
-          </div>
-          <div className="progress-tabs" aria-label="发展与生意分类">
-            <button className={progressMode === "updates" ? "active" : ""} type="button" onClick={() => setProgressMode("updates")}>
-              新增功能
-              <small>{updates.length} 条方向更新</small>
-            </button>
-            <button className={progressMode === "cases" ? "active" : ""} type="button" onClick={() => setProgressMode("cases")}>
-              客户与合作
-              <small>{companyCases.length} 条公开记录</small>
-            </button>
-            <button className={progressMode === "scale" ? "active" : ""} type="button" onClick={() => setProgressMode("scale")}>
-              公开体量
-              <small>只看可归因口径</small>
-            </button>
-          </div>
-        </section>
-      )}
-
-      {view === "progress" && progressMode === "cases" && (
+      {view === "cases" && (
         <section className="section company-cases-section">
           <div className="section-heading">
             <div>
@@ -793,6 +733,23 @@ export default function Home() {
               <h2>先看产品映射，再看商业深度</h2>
             </div>
             <p>完整保留合作方、动作、公开结果、收入边界和来源，便于下一轮继续补充。</p>
+          </div>
+
+          <div className="case-insight-grid case-page-insights">
+            {visibleCaseInsights.map((item) => (
+              <article className="case-insight-card" key={item.product} style={productStyle(item.product)}>
+                <span className="product-name">
+                  <span className="product-dot" />
+                  {productMap[item.product].name}
+                </span>
+                <h3>{item.headline}</h3>
+                <p>{item.finding}</p>
+                <div>
+                  <span>穿透结论</span>
+                  <p>{item.lesson}</p>
+                </div>
+              </article>
+            ))}
           </div>
 
           <div className="case-warning">
@@ -942,14 +899,29 @@ export default function Home() {
         </section>
       )}
 
-      {view === "progress" && progressMode === "updates" && (
+      {view === "updates" && (
         <section className="section">
           <div className="section-heading">
             <div>
               <p className="section-index">更新追踪</p>
-              <h2>只看会改变方向的更新</h2>
+              <h2>先看方向结论，再看更新明细</h2>
             </div>
-            <p>每条记录都保留影响、判断边界和来源。</p>
+            <p>顶部把多条新增能力合成一句话方向。下方台账保留日期、影响、边界和来源。</p>
+          </div>
+          <div className="update-direction-summary">
+            {filteredLatestDirections.map((item) => (
+              <article key={item.product} style={productStyle(item.product)}>
+                <div>
+                  <span className="product-name">
+                    <span className="product-dot" />
+                    {productMap[item.product].name}
+                  </span>
+                  <small>更新至 {item.latestDate}</small>
+                </div>
+                <h3>{item.direction}</h3>
+                <p>{item.reason}</p>
+              </article>
+            ))}
           </div>
           <div className="update-controls">
             <label className="search-box">
@@ -1024,7 +996,7 @@ export default function Home() {
         </section>
       )}
 
-      {view === "progress" && progressMode === "scale" && (
+      {view === "scale" && (
         <section className="section scale-section">
           <div className="section-heading">
             <div>
