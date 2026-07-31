@@ -210,7 +210,7 @@ export const businessModels = {
     customer: "接受公有云 SaaS、希望快速开始的中小企业，或大企业中先落地的单个部门。",
     publicPricing: "个人 Pro ¥59/月；企业版 ¥189/席/月，1 席起。",
     currentJudgment: "它卖的不是最低单价，而是管理员分发 Skill、集中管理成员和让部门快速上线。",
-    validation: "VPC／私有化、实施服务、大客户扩张和具名付费客户仍需验证。",
+    validation: "尚未公开 VPC／私有化价格、实施服务、大客户扩张和具名付费客户。",
     lineage: "2026 年以百度通用 AI 与云能力直接发布；现有证据不支持把它写成编程产品改名。",
   },
   workbuddy: {
@@ -223,7 +223,7 @@ export const businessModels = {
     customer: "已使用腾讯云、腾讯文档、企业微信、乐享、会议或 TAPD，并希望统一购买办公与开发 AI 工具的组织。",
     publicPricing: "个人最低月均约 ¥56；企业 SaaS ¥198/席/月；VPC ¥316/席/月，100 席起；私有化询价。",
     currentJudgment: "商业模式已经从办公席位扩展到 Agent 生产运行，客单价可由部署、托管和实施服务拉高。",
-    validation: "WMA 定价、外部付费客户、Runtime 使用频次和 WorkBuddy 实际席位采用仍未公开。",
+    validation: "WMA 定价、外部付费客户、Runtime 使用频次和 WorkBuddy 实际席位使用量尚未公开。",
     lineage: "从 CodeBuddy Work 原型起步，经 WorkBuddy 内部验证后扩展到办公工作台和企业 Agent 运行治理。",
   },
   qwenwork: {
@@ -236,7 +236,7 @@ export const businessModels = {
     customer: "使用钉钉或阿里云，且依赖工商、法务、销售、运营、跨境电商等外部专业数据的团队。",
     publicPricing: "个人最低月均约 ¥68.58；企业标准版 ¥198/席/月；企业旗舰版询价。",
     currentJudgment: "它用钉钉分发和专业数据包装证明同档席位价值，并利用阿里云采购链路进入组织。",
-    validation: "专业数据的额外成本、授权范围、产品级活跃、续费和当前品牌的具名客户仍需验证。",
+    validation: "专业数据的额外成本、授权范围、产品级活跃、续费和当前品牌的具名客户尚未公开。",
     lineage: "2026 年 7 月将 QoderWork、悟空与 MuleRun 的产品和团队能力收拢到千问办公，不是单一编程产品改名。",
   },
   traework: {
@@ -249,7 +249,7 @@ export const businessModels = {
     customer: "个人端优先服务开发、设计、数据、内容和数字化重度用户；企业端更接近工程和数字化团队。",
     publicPricing: "Work Lite ¥49/月，含 2,000 个 Work 专属积分；Work 独立企业标准价未公开。",
     currentJudgment: "现阶段先卖执行速度和工程交付，传统办公席位还不是可被公开证明的主线。",
-    validation: "Work 独立企业价格、非研发客户、治理能力采用和续费数据仍未公开。",
+    validation: "Work 独立企业价格、非研发客户、治理能力使用情况和续费数据尚未公开。",
     lineage: "由 TRAE IDE／Builder 与 SOLO 能力演进而来，2026 年 6 月以 TRAE Work 统一 Work、Code 和 Design 的交付环境。",
   },
 } satisfies Record<ProductId, {

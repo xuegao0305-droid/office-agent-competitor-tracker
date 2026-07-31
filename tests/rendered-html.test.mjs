@@ -39,9 +39,9 @@ test("server renders the research tracker", async () => {
   assert.match(html, /它怎么做生意/);
   assert.match(html, /企业价值单位/);
   assert.match(html, /标准 SaaS 自助购买/);
-  assert.match(html, /查看能力来源和/);
-  assert.match(html, /张原始截图/);
-  assert.match(html, /证据台账/);
+  assert.match(html, /界面截图与产品演进/);
+  assert.match(html, /详细资料/);
+  assert.doesNotMatch(html, /不能过度推断|每周维护顺序|证据台账/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape|react-loading-skeleton/);
 });
 

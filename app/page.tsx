@@ -8,7 +8,6 @@ import {
   CaseRevenueStatus,
   categories,
   companyCases,
-  EvidenceState,
   latestDirections,
   products,
   ProductId,
@@ -37,15 +36,6 @@ type LocalResearchNote = {
 const productMap = Object.fromEntries(products.map((product) => [product.id, product]));
 const validViews: ViewId[] = ["dumate", "workbuddy", "qwenwork", "traework", "compare", "library", "tracker"];
 
-const stateClass: Record<EvidenceState, string> = {
-  当前主方向: "state-primary",
-  已产品化: "state-ready",
-  持续补齐: "state-building",
-  新近进入: "state-new",
-  待验证: "state-watch",
-  公开证据少: "state-low",
-};
-
 const caseStatusClass: Record<CaseRevenueStatus, string> = {
   明确采购: "case-status-purchase",
   较强部署: "case-status-strong",
@@ -61,10 +51,6 @@ function formatDate(date: string) {
 
 function productStyle(id: ProductId) {
   return { "--product-color": productMap[id].color } as CSSProperties;
-}
-
-function StateBadge({ state }: { state: EvidenceState }) {
-  return <span className={`state-badge ${stateClass[state]}`}>{state}</span>;
 }
 
 function ProductFilterBar({
@@ -304,7 +290,7 @@ export default function Home() {
         </button>
         <div className="header-meta">
           <span>数据快照 {reportMeta.snapshotDate}</span>
-          <button type="button" onClick={() => switchView("tracker")}>记录新信息</button>
+          <button type="button" onClick={() => switchView("tracker")}>更新资料</button>
         </div>
       </header>
 
@@ -334,15 +320,15 @@ export default function Home() {
             <span><strong>四家对比</strong><small>只保留关键差异</small></span>
           </button>
           <button className={view === "library" ? "side-nav-item active" : "side-nav-item"} type="button" onClick={() => openLibrary("updates")}>
-            <span><strong>证据台账</strong><small>更新、客户与体量</small></span>
+            <span><strong>详细资料</strong><small>产品更新、客户与公开数据</small></span>
           </button>
           <button className={view === "tracker" ? "side-nav-item active" : "side-nav-item"} type="button" onClick={() => switchView("tracker")}>
-            <span><strong>追踪录入</strong><small>为下一轮补充事实</small></span>
+            <span><strong>资料更新</strong><small>添加新的产品动态</small></span>
           </button>
         </div>
         <div className="side-nav-meta">
-          <span>下次建议复核</span>
-          <strong>{reportMeta.nextReviewDate}</strong>
+          <span>数据快照</span>
+          <strong>{reportMeta.snapshotDate}</strong>
         </div>
       </nav>
 
@@ -351,12 +337,18 @@ export default function Home() {
           <section className="company-hero" id="top">
             <div className="company-kicker">
               <span>{selectedProduct.name}</span>
-              <StateBadge state={selectedProduct.evidence} />
               <small>最新能力更新至 {selectedDirection.latestDate}</small>
             </div>
             <h1>{selectedProduct.role}</h1>
             <p>{selectedDirection.direction}</p>
           </section>
+
+          <nav className="company-section-nav" aria-label={`${selectedProduct.name} 页面目录`}>
+            <a href="#business">商业模式</a>
+            <a href="#latest">最新能力</a>
+            <a href="#customers">客户与数据</a>
+            <a href="#product-view">产品界面</a>
+          </nav>
 
           <section className="company-summary-grid" aria-label={`${selectedProduct.name} 核心信息`}>
             <article>
@@ -373,10 +365,10 @@ export default function Home() {
             </article>
           </section>
 
-          <section className="content-section business-section">
+          <section className="content-section business-section" id="business">
             <div className="simple-heading">
               <div><span>01 / 商业模式</span><h2>它怎么做生意</h2></div>
-              <p>价格只是起点，更重要的是卖什么、怎么成交和如何扩张。</p>
+              <p>{selectedBusiness.publicPricing}</p>
             </div>
             <div className="business-judgement">
               <span>商业模式结论</span>
@@ -400,13 +392,13 @@ export default function Home() {
               <article><span>主要客户</span><p>{selectedBusiness.customer}</p></article>
               <article className="expansion-card"><span>扩张路径</span><p>{selectedBusiness.expansionPath}</p></article>
             </div>
-            <div className="boundary-note"><strong>还不能证明</strong><p>{selectedBusiness.validation}</p></div>
+            <div className="boundary-note"><strong>公开信息暂未披露</strong><p>{selectedBusiness.validation}</p></div>
           </section>
 
-          <section className="content-section latest-section">
+          <section className="content-section latest-section" id="latest">
             <div className="simple-heading">
               <div><span>02 / 最新能力</span><h2>它最近在补什么</h2></div>
-              <p>{selectedDirection.reason}</p>
+              <p>{selectedProduct.latest}</p>
             </div>
             <div className="direction-callout">
               <span>一句话方向</span>
@@ -431,15 +423,15 @@ export default function Home() {
             </details>
           </section>
 
-          <section className="content-section customer-section">
+          <section className="content-section customer-section" id="customers">
             <div className="simple-heading">
-              <div><span>03 / 客户与体量</span><h2>商业进展有多少证据</h2></div>
-              <p>先区分当前产品、前身能力和同厂商账户，再判断是否真能证明收入。</p>
+              <div><span>03 / 客户与公开数据</span><h2>企业合作与产品体量</h2></div>
+              <p>{selectedCaseInsight?.headline}</p>
             </div>
             {selectedCaseInsight && (
               <div className="case-conclusion">
-                <div><span>当前判断</span><h3>{selectedCaseInsight.headline}</h3><p>{selectedCaseInsight.finding}</p></div>
-                <div><span>可借鉴的地方</span><p>{selectedCaseInsight.lesson}</p></div>
+                <div><span>企业合作概况</span><h3>{selectedCaseInsight.headline}</h3><p>{selectedCaseInsight.finding}</p></div>
+                <div><span>业务启示</span><p>{selectedCaseInsight.lesson}</p></div>
               </div>
             )}
             <div className="customer-evidence-grid">
@@ -460,11 +452,11 @@ export default function Home() {
             </div>
           </section>
 
-          <details className="content-section evidence-drawer">
+          <details className="content-section evidence-drawer" id="product-view">
             <summary>
-              <span>04 / 产品证据</span>
-              <strong>查看能力来源和 {selectedScreenshots.length} 张原始截图</strong>
-              <small>默认收起，需要核对时再展开</small>
+              <span>04 / 产品界面</span>
+              <strong>查看 {selectedScreenshots.length} 张界面截图与产品演进</strong>
+              <small>点击展开</small>
             </summary>
             <div className="lineage-note"><span>能力从哪里来</span><p>{selectedBusiness.lineage}</p></div>
             <div className="screenshot-grid">
@@ -477,16 +469,12 @@ export default function Home() {
             </div>
           </details>
 
-          <section className="company-gap">
-            <div><span>当前证据边界</span><p>{selectedProduct.boundary}</p></div>
-            <div><span>下一次重点追踪</span><p>{selectedProduct.next}</p></div>
-          </section>
         </article>
       )}
 
       {view === "compare" && (
         <section className="standalone-page compare-page">
-          <div className="page-intro"><span>四家对比</span><h1>只看产品路线和生意差异</h1><p>不再把功能数量做成一张庞大表格。需要细节时，再进证据台账。</p></div>
+          <div className="page-intro"><span>四家对比</span><h1>产品路线与商业模式</h1><p>DuMate 主打部门级快速落地，WorkBuddy 向 Agent 运行治理延伸，千问办公结合专业数据与钉钉，TRAE Work 以工程交付向通用工作扩展。</p></div>
           <div className="comparison-card-grid">
             {products.map((product) => {
               const direction = latestDirections.find((item) => item.product === product.id)!;
@@ -495,7 +483,7 @@ export default function Home() {
                   <span className="product-name"><span className="product-dot" />{product.name}</span>
                   <h2>{product.role}</h2>
                   <p>{direction.direction}</p>
-                  <div><span>生意判断</span><p>{businessModels[product.id].currentJudgment}</p></div>
+                  <div><span>商业模式</span><p>{businessModels[product.id].currentJudgment}</p></div>
                   <button type="button" onClick={() => switchView(product.id)}>单独看这家</button>
                 </article>
               );
@@ -510,7 +498,7 @@ export default function Home() {
                   ["企业价值单位", (id: ProductId) => businessModels[id].enterpriseValue],
                   ["成交方式", (id: ProductId) => businessModels[id].dealMode],
                   ["扩张路径", (id: ProductId) => businessModels[id].expansionPath],
-                  ["最需要验证", (id: ProductId) => businessModels[id].validation],
+                  ["公开信息缺口", (id: ProductId) => businessModels[id].validation],
                 ].map(([topic, getter]) => (
                   <tr key={topic as string}>
                     <th>{topic as string}</th>
@@ -525,7 +513,7 @@ export default function Home() {
 
       {view === "library" && (
         <section className="standalone-page library-page">
-          <div className="page-intro"><span>证据台账</span><h1>只在需要核对时查看</h1><p>主页负责说清一家企业，这里保留完整更新、客户和体量证据。</p></div>
+          <div className="page-intro"><span>详细资料</span><h1>产品更新、客户合作与公开数据</h1><p>可按产品、日期、类别、行业和合作进展筛选。</p></div>
           <div className="library-tabs">
             {([["updates", "能力更新"], ["cases", "客户与合作"], ["scale", "公开体量"]] as [LibraryMode, string][]).map(([id, label]) => (
               <button key={id} className={libraryMode === id ? "active" : ""} type="button" onClick={() => openLibrary(id, productFilter)}>{label}</button>
@@ -543,9 +531,9 @@ export default function Home() {
               <div className="update-ledger-list">
                 {filteredUpdates.map((item) => (
                   <article key={item.id} style={productStyle(item.product)}>
-                    <div><time>{formatDate(item.date)}</time><span className="product-name"><span className="product-dot" />{productMap[item.product].name}</span><small>{item.category} · 证据 {item.evidence}</small></div>
+                    <div><time>{formatDate(item.date)}</time><span className="product-name"><span className="product-dot" />{productMap[item.product].name}</span><small>{item.category}</small></div>
                     <h2>{item.title}</h2><p>{item.detail}</p>
-                    <dl><div><dt>改变了什么</dt><dd>{item.implication}</dd></div><div><dt>不能过度推断</dt><dd>{item.boundary}</dd></div></dl>
+                    <dl><div><dt>产品影响</dt><dd>{item.implication}</dd></div><div><dt>公开信息范围</dt><dd>{item.boundary}</dd></div></dl>
                     <a href={item.sourceUrl} target="_blank" rel="noreferrer">查看来源</a>
                   </article>
                 ))}
@@ -559,7 +547,7 @@ export default function Home() {
               <div className="case-controls">
                 <label className="wide"><span>搜索名单</span><input type="search" value={caseQuery} onChange={(event) => setCaseQuery(event.target.value)} placeholder="企业、行业、场景或结果" /></label>
                 <label><span>产品映射</span><select value={caseMapping} onChange={(event) => setCaseMapping(event.target.value as "全部" | CaseMappingLevel)}><option>全部</option><option>当前产品</option><option>前身能力</option><option>同厂商账户</option></select></label>
-                <label><span>商业证据</span><select value={caseRevenue} onChange={(event) => setCaseRevenue(event.target.value as "全部" | CaseRevenueStatus)}><option>全部</option><option>明确采购</option><option>较强部署</option><option>使用未披露采购</option><option>生态活动</option><option>待核线索</option></select></label>
+                <label><span>合作进展</span><select value={caseRevenue} onChange={(event) => setCaseRevenue(event.target.value as "全部" | CaseRevenueStatus)}><option>全部</option><option>明确采购</option><option>较强部署</option><option>使用未披露采购</option><option>生态活动</option><option>待核线索</option></select></label>
                 <label><span>行业</span><select value={caseIndustry} onChange={(event) => setCaseIndustry(event.target.value)}>{caseIndustries.map((item) => <option key={item}>{item}</option>)}</select></label>
               </div>
               <div className="ledger-count">显示 {filteredCases.length} 条，总共 {companyCases.length} 条</div>
@@ -569,7 +557,7 @@ export default function Home() {
                     <div className="case-card-top"><span className="product-name"><span className="product-dot" />{productMap[item.product].name}</span><span className={`case-status ${caseStatusClass[item.revenueStatus]}`}>{item.revenueStatus}</span></div>
                     <h2>{item.partner}</h2><p>{item.result}</p>
                     <div className="case-card-meta"><span>{item.mappingLevel}</span><span>{item.industry}</span><span>{item.date}</span></div>
-                    <details><summary>查看商业判断与来源</summary><p>{item.revenueProof}</p><p>{item.businessMeaning}</p><a href={item.sourceUrl} target="_blank" rel="noreferrer">原始来源</a></details>
+                    <details><summary>查看合作详情与来源</summary><p>{item.revenueProof}</p><p>{item.businessMeaning}</p><a href={item.sourceUrl} target="_blank" rel="noreferrer">原始来源</a></details>
                   </article>
                 ))}
               </div>
@@ -591,10 +579,10 @@ export default function Home() {
 
       {view === "tracker" && (
         <section className="standalone-page tracker-page">
-          <div className="page-intro"><span>追踪录入</span><h1>把新发现先记成事实</h1><p>本地记录仅保存在当前设备。定期导出 JSON，再进入下一轮分析。</p></div>
+          <div className="page-intro"><span>资料更新</span><h1>补充新的产品动态</h1><p>添加功能、价格、企业合作或市场数据，记录保存在当前设备。</p></div>
           <div className="tracker-layout">
             <form className="tracker-form" onSubmit={handleAddNote}>
-              <div className="form-heading"><div><span>新追踪</span><h2>添加一条事实记录</h2></div><small>本地草稿</small></div>
+              <div className="form-heading"><div><span>新资料</span><h2>添加一条产品动态</h2></div><small>本地保存</small></div>
               <div className="form-grid">
                 <label><span>日期</span><input name="date" type="date" defaultValue={new Date().toISOString().slice(0, 10)} /></label>
                 <label><span>产品</span><select name="product" defaultValue="dumate">{products.map((product) => <option value={product.id} key={product.id}>{product.name}</option>)}</select></label>
@@ -602,22 +590,22 @@ export default function Home() {
                 <label><span>事实状态</span><select name="status" defaultValue="待验证"><option>已确认</option><option>待验证</option><option>仅记录</option></select></label>
               </div>
               <label><span>标题</span><input name="title" placeholder="一句话说明发现了什么" /></label>
-              <label><span>事实记录</span><textarea name="detail" rows={5} placeholder="写清公开资料实际说了什么。先不写因果判断。" /></label>
+              <label><span>详细内容</span><textarea name="detail" rows={5} placeholder="填写功能、价格、客户或市场动态" /></label>
               <label><span>来源链接或文件</span><input name="source" placeholder="https:// 或文件名称" /></label>
               <button className="primary-button" type="submit">保存到当前设备</button>
             </form>
             <aside className="maintenance-panel">
-              <h2>每周维护顺序</h2>
-              <ol><li><span>01</span><p>先补来源、日期和事实状态。</p></li><li><span>02</span><p>判断是新能力、价格变化还是客户证据。</p></li><li><span>03</span><p>检查是否改变产品方向或商业模式。</p></li><li><span>04</span><p>最后更新单家页面的结论和证据边界。</p></li></ol>
+              <h2>资料管理</h2>
+              <ol><li><span>01</span><p>记录保存在当前浏览器。</p></li><li><span>02</span><p>可随时导出 JSON 备份。</p></li><li><span>03</span><p>导入 JSON 可恢复已有记录。</p></li><li><span>04</span><p>每条资料都可保留日期和来源。</p></li></ol>
               <div><button type="button" onClick={handleExport} disabled={localNotes.length === 0}>导出追踪 JSON</button><label className="import-button">导入追踪 JSON<input type="file" accept=".json,application/json" onChange={handleImport} /></label></div>
             </aside>
           </div>
           {notice && <div className="notice" role="status">{notice}</div>}
-          <div className="local-records"><div className="records-heading"><h2>当前设备的追踪记录</h2><span>{localNotes.length} 条</span></div>{localNotes.length === 0 ? <div className="empty-state"><strong>还没有本地记录</strong><p>新增记录后，可以导出并带入下一轮分析。</p></div> : <div className="record-list">{localNotes.map((note) => <article key={note.id} style={productStyle(note.product)}><div><span className="product-name"><span className="product-dot" />{productMap[note.product].name}</span><span>{note.date}</span><span>{note.status}</span></div><h3>{note.title}</h3><p>{note.detail}</p>{note.source && <small>来源：{note.source}</small>}<button type="button" onClick={() => handleDeleteNote(note.id)}>删除本地记录</button></article>)}</div>}</div>
+          <div className="local-records"><div className="records-heading"><h2>当前设备的资料</h2><span>{localNotes.length} 条</span></div>{localNotes.length === 0 ? <div className="empty-state"><strong>尚未添加资料</strong><p>新增记录后，可以在这里查看和导出。</p></div> : <div className="record-list">{localNotes.map((note) => <article key={note.id} style={productStyle(note.product)}><div><span className="product-name"><span className="product-dot" />{productMap[note.product].name}</span><span>{note.date}</span><span>{note.status}</span></div><h3>{note.title}</h3><p>{note.detail}</p>{note.source && <small>来源：{note.source}</small>}<button type="button" onClick={() => handleDeleteNote(note.id)}>删除本地记录</button></article>)}</div>}</div>
         </section>
       )}
 
-      <footer><div><strong>{reportMeta.title}</strong><p>数据源：{reportMeta.sourceWorkbook}</p><p>{reportMeta.caseWorkbook}</p></div><div><span>数据快照 {reportMeta.snapshotDate}</span><span>先更新单家结论，再补证据台账</span></div></footer>
+      <footer><div><strong>{reportMeta.title}</strong><p>数据源：{reportMeta.sourceWorkbook}</p><p>{reportMeta.caseWorkbook}</p></div><div><span>数据快照 {reportMeta.snapshotDate}</span><span>持续更新产品、价格与企业合作信息</span></div></footer>
 
       {activeScreenshot && (
         <div className="lightbox" role="dialog" aria-modal="true" aria-label={activeScreenshot.title} onClick={() => setActiveScreenshot(null)}>
