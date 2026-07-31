@@ -199,6 +199,73 @@ export const products = [
   },
 ];
 
+export const businessModels = {
+  dumate: {
+    summary: "以个人订阅作为体验入口，企业端按席位和共享资源点收费，主打从单部门低门槛起量。",
+    personalEntry: "低价个人订阅与积分",
+    enterpriseValue: "企业席位＋共享资源点",
+    highTicketTrigger: "部门扩席与资源点增购",
+    dealMode: "标准 SaaS 自助购买／轻售前",
+    expansionPath: "个人试用 → 部门试点 → 增加席位和资源点",
+    customer: "接受公有云 SaaS、希望快速开始的中小企业，或大企业中先落地的单个部门。",
+    publicPricing: "个人 Pro ¥59/月；企业版 ¥189/席/月，1 席起。",
+    currentJudgment: "它卖的不是最低单价，而是管理员分发 Skill、集中管理成员和让部门快速上线。",
+    validation: "VPC／私有化、实施服务、大客户扩张和具名付费客户仍需验证。",
+    lineage: "2026 年以百度通用 AI 与云能力直接发布；现有证据不支持把它写成编程产品改名。",
+  },
+  workbuddy: {
+    summary: "以个人会员和免费使用获客，企业端卖生产力套件、Credits、VPC／私有化与 Agent Runtime 托管。",
+    personalEntry: "免费使用＋Buddy AI 会员",
+    enterpriseValue: "企业套件、Credits 与 Agent Runtime",
+    highTicketTrigger: "VPC／私有化／WMA 托管",
+    dealMode: "产品增长＋腾讯云项目销售",
+    expansionPath: "个人／团队 → 企业套件 → VPC／私有化 → 运行托管",
+    customer: "已使用腾讯云、腾讯文档、企业微信、乐享、会议或 TAPD，并希望统一购买办公与开发 AI 工具的组织。",
+    publicPricing: "个人最低月均约 ¥56；企业 SaaS ¥198/席/月；VPC ¥316/席/月，100 席起；私有化询价。",
+    currentJudgment: "商业模式已经从办公席位扩展到 Agent 生产运行，客单价可由部署、托管和实施服务拉高。",
+    validation: "WMA 定价、外部付费客户、Runtime 使用频次和 WorkBuddy 实际席位采用仍未公开。",
+    lineage: "从 CodeBuddy Work 原型起步，经 WorkBuddy 内部验证后扩展到办公工作台和企业 Agent 运行治理。",
+  },
+  qwenwork: {
+    summary: "以个人订阅和积分体验专业数据，企业端卖席位、共享积分、组织入口、专业数据和 VPC。",
+    personalEntry: "免费＋订阅＋积分",
+    enterpriseValue: "企业席位＋共享积分＋钉钉组织入口",
+    highTicketTrigger: "VPC、专业数据与岗位套件",
+    dealMode: "钉钉／阿里云渠道＋企业售前",
+    expansionPath: "个人数据工作 → 组织开通 → 企业标准版 → VPC 与岗位扩展",
+    customer: "使用钉钉或阿里云，且依赖工商、法务、销售、运营、跨境电商等外部专业数据的团队。",
+    publicPricing: "个人最低月均约 ¥68.58；企业标准版 ¥198/席/月；企业旗舰版询价。",
+    currentJudgment: "它用钉钉分发和专业数据包装证明同档席位价值，并利用阿里云采购链路进入组织。",
+    validation: "专业数据的额外成本、授权范围、产品级活跃、续费和当前品牌的具名客户仍需验证。",
+    lineage: "2026 年 7 月将 QoderWork、悟空与 MuleRun 的产品和团队能力收拢到千问办公，不是单一编程产品改名。",
+  },
+  traework: {
+    summary: "个人端按积分、并发和优先响应收费；企业端通过 SaaS／VPC、知识、规则和 Agent 治理方案询价。",
+    personalEntry: "免费核心能力＋Work Lite",
+    enterpriseValue: "积分、并发与优先响应",
+    highTicketTrigger: "高频吞吐与企业 SaaS／VPC 方案",
+    dealMode: "产品驱动＋企业方案咨询",
+    expansionPath: "免费体验 → Work Lite／套件会员 → 高频并发 → 企业方案",
+    customer: "个人端优先服务开发、设计、数据、内容和数字化重度用户；企业端更接近工程和数字化团队。",
+    publicPricing: "Work Lite ¥49/月，含 2,000 个 Work 专属积分；Work 独立企业标准价未公开。",
+    currentJudgment: "现阶段先卖执行速度和工程交付，传统办公席位还不是可被公开证明的主线。",
+    validation: "Work 独立企业价格、非研发客户、治理能力采用和续费数据仍未公开。",
+    lineage: "由 TRAE IDE／Builder 与 SOLO 能力演进而来，2026 年 6 月以 TRAE Work 统一 Work、Code 和 Design 的交付环境。",
+  },
+} satisfies Record<ProductId, {
+  summary: string;
+  personalEntry: string;
+  enterpriseValue: string;
+  highTicketTrigger: string;
+  dealMode: string;
+  expansionPath: string;
+  customer: string;
+  publicPricing: string;
+  currentJudgment: string;
+  validation: string;
+  lineage: string;
+}>;
+
 export const latestDirections = [
   {
     product: "dumate" as ProductId,

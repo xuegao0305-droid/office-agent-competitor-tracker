@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 const pagesBasePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 const siteUrl = "https://xuegao0305-droid.github.io/office-agent-competitor-tracker";
 const description =
-  "对比 DuMate、WorkBuddy、千问办公和 TRAE Work 的产品差异、发展方向、企业生意与公开体量。";
+  "逐家查看 DuMate、WorkBuddy、千问办公和 TRAE Work 的产品方向、商业模式、客户证据与公开体量。";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

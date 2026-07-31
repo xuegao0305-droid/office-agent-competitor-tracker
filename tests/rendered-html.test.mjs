@@ -34,11 +34,14 @@ test("server renders the research tracker", async () => {
   assert.match(html, /WorkBuddy/);
   assert.match(html, /千问办公/);
   assert.match(html, /TRAE Work/);
-  assert.match(html, /最近新增能力正在把四家带向哪里/);
+  assert.match(html, /每次只看一家/);
   assert.match(html, /DuMate 正在从单机桌面执行工具/);
-  assert.match(html, /WorkBuddy 正在从综合办公工作台/);
-  assert.match(html, /从能力更新穿透到竞争判断/);
-  assert.match(html, /查看完整能力台账/);
+  assert.match(html, /它怎么做生意/);
+  assert.match(html, /企业价值单位/);
+  assert.match(html, /标准 SaaS 自助购买/);
+  assert.match(html, /查看能力来源和/);
+  assert.match(html, /张原始截图/);
+  assert.match(html, /证据台账/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape|react-loading-skeleton/);
 });
 
