@@ -1,0 +1,4 @@
+interface:
+  display_name: "专家台账与保守去重"
+  short_description: "将多家中介专家信息整理为单页 Excel 台账并保守标注疑似重复"
+  default_prompt: "使用 $build-expert-ledger 将多家中介专家资料整理成单工作表 Excel 台账，并保守标注疑似重复。"
